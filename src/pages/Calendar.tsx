@@ -145,7 +145,6 @@ const Calendar: React.FC = () => {
 
   const reminderLabels: Record<number, string> = {
     0: '不提醒',
-    0: '事件开始时',
     5: '5分钟前',
     15: '15分钟前',
     30: '30分钟前',
