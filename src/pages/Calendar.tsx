@@ -336,6 +336,10 @@ const Calendar: React.FC = () => {
         title={editingEvent ? '编辑事件' : '新建事件'}
         footer={
           <>
+            {editingEvent && (
+              <button className="btn-secondary text-red-600" onClick={() => { handleDelete(editingEvent); setShowModal(false) }}>删除</button>
+            )}
+            <div className="flex-1" />
             <button className="btn-secondary" onClick={() => setShowModal(false)}>取消</button>
             <button className="btn-primary" onClick={handleSave} disabled={!form.title.trim()}>保存</button>
           </>

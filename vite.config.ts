@@ -1,16 +1,13 @@
 import { defineConfig } from 'vite'
 import react from '@vitejs/plugin-react'
 import path from 'path'
-import http from 'http'
-import https from 'https'
+import type { IncomingMessage, ServerResponse } from 'http'
 
-// WebDAV proxy plugin: bypass CORS by proxying through Vite dev server
 function webdavProxyPlugin() {
   return {
     name: 'webdav-proxy',
     configureServer(server: any) {
-      server.middlewares.use('/api/webdav-proxy', async (req: any, res: any) => {
-        // Only handle POST requests from the browser
+      server.middlewares.use('/api/webdav-proxy', async (req: IncomingMessage, res: ServerResponse) => {
         if (req.method !== 'POST') {
           res.statusCode = 405
           res.end('Method not allowed')
@@ -21,19 +18,20 @@ function webdavProxyPlugin() {
         req.on('data', (chunk: string) => (rawBody += chunk))
         req.on('end', () => {
           try {
-            const { targetUrl, method, headers: customHeaders, body: requestBody } = JSON.parse(rawBody)
+            const parsed = JSON.parse(rawBody)
+            const { targetUrl, method: reqMethod, headers: customHeaders, body: requestBody } = parsed
             if (!targetUrl) {
               res.statusCode = 400
               res.end(JSON.stringify({ error: 'Missing targetUrl' }))
               return
             }
 
-            // Determine protocol
             const urlObj = new URL(targetUrl)
-            const httpModule = urlObj.protocol === 'https:' ? https : http
+            const httpModule = urlObj.protocol === 'https:' ? await import('https') : await import('http')
+            const mod = httpModule.default || httpModule
 
-            const options: http.RequestOptions = {
-              method: method || 'GET',
+            const options: any = {
+              method: reqMethod || 'GET',
               hostname: urlObj.hostname,
               port: urlObj.port || (urlObj.protocol === 'https:' ? 443 : 80),
               path: urlObj.pathname + urlObj.search,
@@ -43,9 +41,9 @@ function webdavProxyPlugin() {
               },
             }
 
-            const proxyReq = httpModule.request(options, (proxyRes) => {
+            const proxyReq = mod.request(options, (proxyRes: any) => {
               let data = ''
-              proxyRes.on('data', (chunk) => (data += chunk))
+              proxyRes.on('data', (chunk: any) => (data += chunk))
               proxyRes.on('end', () => {
                 res.statusCode = 200
                 res.setHeader('Content-Type', 'application/json')
@@ -57,7 +55,7 @@ function webdavProxyPlugin() {
               })
             })
 
-            proxyReq.on('error', (err) => {
+            proxyReq.on('error', (err: Error) => {
               res.statusCode = 500
               res.end(JSON.stringify({ error: err.message }))
             })
