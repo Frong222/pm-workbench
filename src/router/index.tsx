@@ -1,9 +1,8 @@
 import { createBrowserRouter, Navigate } from 'react-router-dom'
 import Layout from '@/components/Layout'
 import Dashboard from '@/pages/Dashboard'
-import Tasks from '@/pages/Tasks'
+import Schedule from '@/pages/Schedule'
 import Requirements from '@/pages/Requirements'
-import Calendar from '@/pages/Calendar'
 import Projects from '@/pages/Projects'
 import Knowledge from '@/pages/Knowledge'
 import Reviews from '@/pages/Reviews'
@@ -19,9 +18,10 @@ export const router = createBrowserRouter(
       element: <Layout />,
       children: [
         { index: true, element: <Dashboard /> },
-        { path: 'tasks', element: <Tasks /> },
+        { path: 'schedule', element: <Schedule /> },
+        { path: 'tasks', element: <Navigate to="/schedule" replace /> },
+        { path: 'calendar', element: <Navigate to="/schedule" replace /> },
         { path: 'requirements', element: <Requirements /> },
-        { path: 'calendar', element: <Calendar /> },
         { path: 'projects', element: <Projects /> },
         { path: 'knowledge', element: <Knowledge /> },
         { path: 'reviews', element: <Reviews /> },

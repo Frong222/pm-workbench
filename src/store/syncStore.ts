@@ -78,16 +78,16 @@ export const useSyncStore = create<SyncStore>((set, get) => ({
       const status = result.status
       if (status === 200 || status === 404) {
         // 200 = file exists, 404 = file doesn't exist yet (new backup)
-        set({ syncStatus: 'success', syncMessage: '✅ 连接成功！WebDAV 配置有效。' })
+        set({ syncStatus: 'success', syncMessage: '连接成功！WebDAV 配置有效。' })
       } else if (status === 401) {
-        set({ syncStatus: 'error', syncMessage: '❌ 认证失败，请检查用户名和密码/授权码' })
+        set({ syncStatus: 'error', syncMessage: '认证失败，请检查用户名和密码/授权码' })
       } else if (status === 403) {
-        set({ syncStatus: 'error', syncMessage: '❌ 权限不足，请检查目录权限' })
+        set({ syncStatus: 'error', syncMessage: '权限不足，请检查目录权限' })
       } else {
-        set({ syncStatus: 'error', syncMessage: `❌ 连接异常 (HTTP ${status})` })
+        set({ syncStatus: 'error', syncMessage: `连接异常 (HTTP ${status})` })
       }
     } catch (error: any) {
-      set({ syncStatus: 'error', syncMessage: `❌ 连接失败: ${error.message || '无法连接到服务器，请检查地址是否正确'}` })
+      set({ syncStatus: 'error', syncMessage: `连接失败: ${error.message || '无法连接到服务器，请检查地址是否正确'}` })
     }
   },
 

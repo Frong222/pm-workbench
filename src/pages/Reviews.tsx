@@ -213,7 +213,7 @@ ${manualNotes || '（无）'}
   return (
     <div className="space-y-6">
       <div className="flex items-center justify-between">
-        <h2 className="text-2xl font-semibold text-gray-900">复盘总结</h2>
+        <h2 className="section-title">复盘总结</h2>
         <div className="flex items-center space-x-2">
           <button className="btn-secondary btn-sm" onClick={handleExport}>导出报告</button>
           <button className="btn-primary" onClick={handleSaveReview} disabled={saving}>
@@ -223,7 +223,7 @@ ${manualNotes || '（无）'}
       </div>
 
       {/* Tab switch */}
-      <div className="flex items-center space-x-1 bg-gray-100 rounded-lg p-0.5 w-fit">
+      <div className="segmented-control">
         {[
           { key: 'daily' as const, label: '日报' },
           { key: 'weekly' as const, label: '周报' },
@@ -231,9 +231,7 @@ ${manualNotes || '（无）'}
         ].map((tab) => (
           <button
             key={tab.key}
-            className={`px-4 py-1.5 text-sm rounded-md transition-colors ${
-              activeTab === tab.key ? 'bg-white shadow-sm font-medium' : 'text-gray-600'
-            }`}
+            className={`segmented-item ${activeTab === tab.key ? 'active' : ''}`}
             onClick={() => setActiveTab(tab.key)}
           >
             {tab.label}
@@ -242,38 +240,38 @@ ${manualNotes || '（无）'}
       </div>
 
       {/* Period info */}
-      <p className="text-sm text-gray-500">统计周期：{period.label}</p>
+      <p className="text-muted-foreground text-sm">统计周期：{period.label}</p>
 
       {/* Stats cards */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-        <div className="card p-5">
-          <p className="text-sm text-gray-500">总任务数</p>
-          <p className="text-2xl font-bold text-gray-900 mt-1">{stats.totalTasks}</p>
+        <div className="stat-card">
+          <p className="stat-label">总任务数</p>
+          <p className="stat-value bg-gradient-to-r from-sky-400 to-blue-500 bg-clip-text text-transparent">{stats.totalTasks}</p>
         </div>
-        <div className="card p-5">
-          <p className="text-sm text-gray-500">已完成</p>
-          <p className="text-2xl font-bold text-green-600 mt-1">{stats.completedTasks}</p>
+        <div className="stat-card">
+          <p className="stat-label">已完成</p>
+          <p className="stat-value bg-gradient-to-r from-green-400 to-emerald-500 bg-clip-text text-transparent">{stats.completedTasks}</p>
         </div>
-        <div className="card p-5">
-          <p className="text-sm text-gray-500">完成率</p>
-          <p className="text-2xl font-bold text-primary-500 mt-1">{stats.completionRate}%</p>
+        <div className="stat-card">
+          <p className="stat-label">完成率</p>
+          <p className="stat-value bg-gradient-to-r from-indigo-400 to-violet-400 bg-clip-text text-transparent">{stats.completionRate}%</p>
         </div>
-        <div className="card p-5">
-          <p className="text-sm text-gray-500">平均完成时长</p>
-          <p className="text-2xl font-bold text-amber-600 mt-1">{stats.avgCompletionHours}h</p>
+        <div className="stat-card">
+          <p className="stat-label">平均完成时长</p>
+          <p className="stat-value bg-gradient-to-r from-amber-400 to-orange-400 bg-clip-text text-transparent">{stats.avgCompletionHours}h</p>
         </div>
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
         {/* Trend chart */}
         <div className="card p-5">
-          <h3 className="font-semibold text-gray-900 mb-4">完成任务趋势</h3>
+          <h3 className="font-semibold text-foreground mb-4">完成任务趋势</h3>
           <ResponsiveContainer width="100%" height={250}>
             <BarChart data={trendData}>
-              <CartesianGrid strokeDasharray="3 3" stroke="#f0f0f0" />
-              <XAxis dataKey="date" tick={{ fontSize: 12 }} />
-              <YAxis tick={{ fontSize: 12 }} allowDecimals={false} />
-              <Tooltip />
+              <CartesianGrid strokeDasharray="3 3" stroke="#334155" />
+              <XAxis dataKey="date" tick={{ fontSize: 12, fill: '#94a3b8' }} />
+              <YAxis tick={{ fontSize: 12, fill: '#94a3b8' }} allowDecimals={false} />
+              <Tooltip contentStyle={{ backgroundColor: '#1e293b', border: '1px solid #334155', borderRadius: '8px', color: '#f1f5f9' }} />
               <Bar dataKey="completed" name="完成任务" fill="#3b82f6" radius={[4, 4, 0, 0]} />
             </BarChart>
           </ResponsiveContainer>
@@ -281,7 +279,7 @@ ${manualNotes || '（无）'}
 
         {/* Project distribution */}
         <div className="card p-5">
-          <h3 className="font-semibold text-gray-900 mb-4">项目分布</h3>
+          <h3 className="font-semibold text-foreground mb-4">项目分布</h3>
           {pieData.length > 0 ? (
             <ResponsiveContainer width="100%" height={250}>
               <PieChart>
@@ -297,11 +295,11 @@ ${manualNotes || '（无）'}
                     <Cell key={index} fill={entry.color} />
                   ))}
                 </Pie>
-                <Tooltip />
+                <Tooltip contentStyle={{ backgroundColor: '#1e293b', border: '1px solid #334155', borderRadius: '8px', color: '#f1f5f9' }} />
               </PieChart>
             </ResponsiveContainer>
           ) : (
-            <div className="flex items-center justify-center h-[250px] text-gray-400 text-sm">
+            <div className="flex items-center justify-center h-[250px] text-muted-foreground text-sm">
               暂无数据
             </div>
           )}
@@ -310,9 +308,9 @@ ${manualNotes || '（无）'}
 
       {/* Project progress list */}
       <div className="card p-5">
-        <h3 className="font-semibold text-gray-900 mb-4">项目进度</h3>
+        <h3 className="font-semibold text-foreground mb-4">项目进度</h3>
         {projects.length === 0 ? (
-          <p className="text-gray-500 text-sm">暂无项目</p>
+          <p className="text-muted-foreground text-sm">暂无项目</p>
         ) : (
           <div className="space-y-3">
             {projects.map((p) => {
@@ -320,12 +318,12 @@ ${manualNotes || '（无）'}
               return (
                 <div key={p.id}>
                   <div className="flex items-center justify-between text-sm mb-1">
-                    <span className="font-medium text-gray-700">{p.name}</span>
-                    <span className="text-gray-500">{progress}%</span>
+                    <span className="font-medium text-foreground">{p.name}</span>
+                    <span className="text-muted-foreground">{progress}%</span>
                   </div>
-                  <div className="w-full bg-gray-200 rounded-full h-2">
+                  <div className="progress">
                     <div
-                      className="h-2 rounded-full transition-all duration-300"
+                      className="progress-bar"
                       style={{ width: `${progress}%`, backgroundColor: p.color }}
                     />
                   </div>
@@ -338,7 +336,7 @@ ${manualNotes || '（无）'}
 
       {/* Manual notes */}
       <div className="card p-5">
-        <h3 className="font-semibold text-gray-900 mb-3">手动复盘笔记</h3>
+        <h3 className="font-semibold text-foreground mb-3">手动复盘笔记</h3>
         <textarea
           className="input min-h-[120px]"
           placeholder={`写下你对${activeTab === 'daily' ? '今天' : activeTab === 'weekly' ? '本周' : '本月'}工作的总结与反思...

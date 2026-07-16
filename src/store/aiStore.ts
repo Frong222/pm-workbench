@@ -146,7 +146,7 @@ ${context}
         id: crypto.randomUUID(),
         conversationId: currentConversationId,
         role: 'assistant',
-        content: `❌ 请求失败：${error.message || '请检查 API 配置是否正确'}`,
+        content: `请求失败：${error.message || '请检查 API 配置是否正确'}`,
         createdAt: new Date().toISOString(),
       }
       await db.chatMessages.add(errorMsg)

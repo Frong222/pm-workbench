@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from 'react'
+import { Folder } from 'lucide-react'
 import { useProjectStore } from '@/store/projectStore'
 import { useTaskStore } from '@/store/taskStore'
 import { type ProjectStatus } from '@/types'
@@ -90,7 +91,7 @@ const Projects: React.FC = () => {
   return (
     <div className="space-y-6">
       <div className="flex items-center justify-between">
-        <h2 className="text-2xl font-semibold text-gray-900">项目管理</h2>
+        <h2 className="section-title">项目管理</h2>
         <button className="btn-primary" onClick={openNew}>
           + 新建项目
         </button>
@@ -98,12 +99,13 @@ const Projects: React.FC = () => {
 
       {loading && projects.length === 0 ? (
         <div className="flex items-center justify-center min-h-[40vh]">
-          <div className="text-gray-500">加载中...</div>
+          <div className="dot-loading" />
         </div>
       ) : projects.length === 0 ? (
-        <div className="card p-12 text-center">
-          <div className="text-4xl mb-4">📁</div>
-          <p className="text-gray-500">暂无项目</p>
+        <div className="empty-state">
+          <div className="empty-icon"><Folder className="w-10 h-10" /></div>
+          <div className="empty-title">暂无项目</div>
+          <div className="empty-desc">创建你的第一个项目来开始管理工作</div>
           <button className="btn-primary mt-4" onClick={openNew}>
             创建第一个项目
           </button>
@@ -114,37 +116,52 @@ const Projects: React.FC = () => {
             const progress = getProjectProgress(project.id)
             const projectTasks = tasks.filter((t) => t.projectId === project.id)
             return (
-              <div key={project.id} className="card-hover p-5">
+              <div
+                key={project.id}
+                className="card card-hover p-5"
+                onMouseEnter={(e) => {
+                  e.currentTarget.style.borderColor = `${project.color}40`
+                  e.currentTarget.style.boxShadow = `0 4px 20px rgba(0,0,0,0.3), 0 0 15px ${project.color}10`
+                }}
+                onMouseLeave={(e) => {
+                  e.currentTarget.style.borderColor = ''
+                  e.currentTarget.style.boxShadow = ''
+                }}
+              >
                 <div className="flex items-center justify-between mb-3">
                   <div className="flex items-center space-x-2">
                     <div
                       className="w-3 h-3 rounded-full"
-                      style={{ backgroundColor: project.color }}
+                      style={{ backgroundColor: project.color, boxShadow: `0 0 8px ${project.color}60` }}
                     />
-                    <h3 className="font-semibold text-gray-900">{project.name}</h3>
+                    <h3 className="font-semibold text-foreground">{project.name}</h3>
                   </div>
                   <span
-                    className="badge"
-                    style={{ backgroundColor: statusColors[project.status] + '20', color: statusColors[project.status] }}
+                    className="badge border-2"
+                    style={{
+                      backgroundColor: statusColors[project.status] + '15',
+                      color: statusColors[project.status],
+                      borderColor: statusColors[project.status] + '30',
+                    }}
                   >
                     {statusLabels[project.status]}
                   </span>
                 </div>
                 {project.description && (
-                  <p className="text-sm text-gray-500 mb-3 line-clamp-2">{project.description}</p>
+                  <p className="text-sm text-muted-foreground mb-3 line-clamp-2">{project.description}</p>
                 )}
                 <div className="space-y-2 mb-4">
                   <div className="flex items-center justify-between text-sm">
-                    <span className="text-gray-500">进度</span>
-                    <span className="font-medium text-gray-700">{progress}%</span>
+                    <span className="text-muted-foreground">进度</span>
+                    <span className="font-medium text-foreground">{progress}%</span>
                   </div>
-                  <div className="w-full bg-gray-200 rounded-full h-2">
+                  <div className="progress">
                     <div
-                      className="h-2 rounded-full transition-all duration-300"
-                      style={{ width: `${progress}%`, backgroundColor: project.color }}
+                      className="progress-bar"
+                      style={{ width: `${progress}%`, backgroundColor: project.color, boxShadow: `0 0 10px ${project.color}40` }}
                     />
                   </div>
-                  <div className="flex justify-between text-xs text-gray-400">
+                  <div className="flex justify-between text-xs text-muted-foreground">
                     <span>任务 {projectTasks.length}</span>
                     {project.endDate && <span>截止 {project.endDate}</span>}
                   </div>
@@ -153,7 +170,7 @@ const Projects: React.FC = () => {
                   <button className="btn-ghost btn-sm" onClick={() => openEdit(project)}>
                     编辑
                   </button>
-                  <button className="btn-ghost btn-sm text-red-600" onClick={() => handleDelete(project.id)}>
+                  <button className="btn-ghost btn-sm text-destructive" onClick={() => handleDelete(project.id)}>
                     删除
                   </button>
                 </div>
@@ -180,7 +197,7 @@ const Projects: React.FC = () => {
       >
         <div className="space-y-4">
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">项目名称 *</label>
+            <label className="block text-sm font-medium text-foreground mb-1">项目名称 *</label>
             <input
               className="input"
               placeholder="请输入项目名称"
@@ -190,7 +207,7 @@ const Projects: React.FC = () => {
             />
           </div>
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">描述</label>
+            <label className="block text-sm font-medium text-foreground mb-1">描述</label>
             <textarea
               className="input min-h-[80px]"
               placeholder="输入项目描述"
@@ -200,7 +217,7 @@ const Projects: React.FC = () => {
           </div>
           <div className="grid grid-cols-2 gap-4">
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">状态</label>
+              <label className="block text-sm font-medium text-foreground mb-1">状态</label>
               <select
                 className="input"
                 value={form.status}
@@ -213,7 +230,7 @@ const Projects: React.FC = () => {
               </select>
             </div>
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">颜色</label>
+              <label className="block text-sm font-medium text-foreground mb-1">颜色</label>
               <input
                 type="color"
                 className="input h-[38px] p-1"
@@ -224,7 +241,7 @@ const Projects: React.FC = () => {
           </div>
           <div className="grid grid-cols-2 gap-4">
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">开始日期</label>
+              <label className="block text-sm font-medium text-foreground mb-1">开始日期</label>
               <input
                 type="date"
                 className="input"
@@ -233,7 +250,7 @@ const Projects: React.FC = () => {
               />
             </div>
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">截止日期</label>
+              <label className="block text-sm font-medium text-foreground mb-1">截止日期</label>
               <input
                 type="date"
                 className="input"

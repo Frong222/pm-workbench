@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from 'react'
 import { format } from 'date-fns'
+import { ClipboardList, RefreshCw, Users } from 'lucide-react'
 import { useMeetingStore } from '@/store/meetingStore'
 import { useTaskStore } from '@/store/taskStore'
 import type { ExtractedTask } from '@/types'
@@ -195,30 +196,32 @@ const Meetings: React.FC = () => {
   return (
     <div className="flex h-[calc(100vh-8rem)] space-x-4">
       {/* Meeting list */}
-      <div className="w-72 shrink-0 card overflow-hidden flex flex-col">
-        <div className="p-3 border-b border-gray-100 flex items-center justify-between">
-          <h3 className="font-semibold text-gray-900">会议记录</h3>
-          <button className="btn-primary btn-sm" onClick={openNew}>+ 新建</button>
+      <div className="w-72 shrink-0 bg-card text-card-foreground rounded-xl border border-border shadow-sm overflow-hidden flex flex-col">
+        <div className="p-3 border-b border-border flex items-center justify-between">
+          <h3 className="font-semibold text-foreground">会议记录</h3>
+          <button className="btn-primary btn-sm active:scale-[0.97] transition-all duration-200" onClick={openNew}>+ 新建</button>
         </div>
         <div className="flex-1 overflow-y-auto">
           {meetings.length === 0 ? (
-            <div className="text-center py-8 text-gray-400 text-sm">暂无会议记录</div>
+            <div className="empty-state py-8">
+              <p className="empty-desc">暂无会议记录</p>
+            </div>
           ) : (
             meetings.map((meeting) => (
               <div
                 key={meeting.id}
-                className={`px-3 py-3 cursor-pointer border-b border-gray-50 hover:bg-gray-50 ${
-                  selectedMeeting === meeting.id ? 'bg-primary-50' : ''
+                className={`px-3 py-3 cursor-pointer border-b border-border/50 hover:bg-muted transition-all duration-200 ${
+                  selectedMeeting === meeting.id ? 'bg-primary/15 text-primary' : ''
                 }`}
                 onClick={() => selectMeeting(meeting.id)}
               >
-                <p className="font-medium text-sm text-gray-900 truncate">{meeting.title}</p>
-                <p className="text-xs text-gray-500 mt-0.5">
+                <p className="font-medium text-sm text-foreground truncate">{meeting.title}</p>
+                <p className="text-xs text-muted-foreground mt-0.5">
                   {format(new Date(meeting.date), 'MM月dd日 HH:mm')}
                 </p>
                 {meeting.participants.length > 0 && (
-                  <p className="text-xs text-gray-400 mt-0.5 truncate">
-                    👥 {meeting.participants.join(', ')}
+                  <p className="text-xs text-muted-foreground mt-0.5 truncate flex items-center">
+                    <Users className="w-3 h-3 mr-1" />{meeting.participants.join(', ')}
                   </p>
                 )}
               </div>
@@ -228,36 +231,36 @@ const Meetings: React.FC = () => {
       </div>
 
       {/* Detail / Edit / Empty state */}
-      <div className="flex-1 card overflow-hidden">
+      <div className="flex-1 bg-card text-card-foreground rounded-xl border border-border shadow-sm overflow-hidden">
         {isEditing ? (
           <div className="flex flex-col h-full">
             {/* Edit header */}
-            <div className="px-4 py-3 border-b border-gray-200 bg-gray-50 flex items-center justify-between">
-              <h3 className="font-semibold text-gray-900">{editingMeeting ? '编辑会议' : '新建会议'}</h3>
+            <div className="px-4 py-3 border-b border-border bg-muted flex items-center justify-between">
+              <h3 className="font-semibold text-foreground">{editingMeeting ? '编辑会议' : '新建会议'}</h3>
               <div className="flex items-center space-x-2">
-                <button className="btn-secondary btn-sm" onClick={handleCancel}>取消</button>
-                <button className="btn-primary btn-sm" onClick={handleSave} disabled={!form.title.trim()}>保存</button>
+                <button className="btn-secondary btn-sm active:scale-[0.97] transition-all duration-200" onClick={handleCancel}>取消</button>
+                <button className="btn-primary btn-sm active:scale-[0.97] transition-all duration-200" onClick={handleSave} disabled={!form.title.trim()}>保存</button>
               </div>
             </div>
 
             <div className="flex-1 overflow-y-auto p-4 space-y-4">
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">会议标题 *</label>
+                <label className="block text-sm font-medium text-foreground mb-1">会议标题 *</label>
                 <input className="input" placeholder="如：需求评审会" value={form.title}
                   onChange={(e) => setForm({ ...form, title: e.target.value })} autoFocus />
               </div>
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">时间</label>
+                <label className="block text-sm font-medium text-foreground mb-1">时间</label>
                 <input type="datetime-local" className="input" value={form.date}
                   onChange={(e) => setForm({ ...form, date: e.target.value })} />
               </div>
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">参会人（逗号分隔）</label>
+                <label className="block text-sm font-medium text-foreground mb-1">参会人（逗号分隔）</label>
                 <input className="input" placeholder="张三, 李四, 王五" value={form.participants}
                   onChange={(e) => setForm({ ...form, participants: e.target.value })} />
               </div>
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">会议内容</label>
+                <label className="block text-sm font-medium text-foreground mb-1">会议内容</label>
                 <textarea className="input min-h-[160px] font-mono text-sm" placeholder={`记录会议内容，支持结构化格式：
 
 - 讨论主题1
@@ -271,21 +274,19 @@ TODO / 待办：
 - [ ] 准备演示材料`}
                   value={form.content}
                   onChange={(e) => setForm({ ...form, content: e.target.value })} />
-                <p className="text-xs text-gray-400 mt-1">自动提取任务基于 "TODO/待办:" 或 "[ ]" 格式</p>
+                <p className="text-xs text-muted-foreground mt-1">自动提取任务基于 "TODO/待办:" 或 "[ ]" 格式</p>
               </div>
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">备注</label>
+                <label className="block text-sm font-medium text-foreground mb-1">备注</label>
                 <textarea className="input min-h-[80px]" placeholder="额外备注" value={form.notes}
                   onChange={(e) => setForm({ ...form, notes: e.target.value })} />
               </div>
             </div>
           </div>
         ) : !selectedMeeting ? (
-          <div className="flex items-center justify-center h-full">
-            <div className="text-center">
-              <div className="text-4xl mb-3">📋</div>
-              <p className="text-gray-500">选择一条会议记录查看详情，或点击新建</p>
-            </div>
+          <div className="empty-state">
+            <div className="empty-icon"><ClipboardList className="w-10 h-10" /></div>
+            <p className="empty-desc">选择一条会议记录查看详情，或点击新建</p>
           </div>
         ) : (() => {
           const meeting = meetings.find((m) => m.id === selectedMeeting)
@@ -293,17 +294,17 @@ TODO / 待办：
           return (
             <div className="flex flex-col h-full">
               {/* Meeting detail header */}
-              <div className="px-4 py-3 border-b border-gray-200 bg-gray-50 flex items-center justify-between">
+              <div className="px-4 py-3 border-b border-border bg-muted flex items-center justify-between">
                 <div>
-                  <h3 className="font-semibold text-gray-900">{meeting.title}</h3>
-                  <p className="text-xs text-gray-500 mt-0.5">
+                  <h3 className="font-semibold text-foreground">{meeting.title}</h3>
+                  <p className="text-xs text-muted-foreground mt-0.5">
                     {format(new Date(meeting.date), 'yyyy年MM月dd日 HH:mm')}
                     {meeting.participants.length > 0 && ` | 👥 ${meeting.participants.join(', ')}`}
                   </p>
                 </div>
                 <div className="flex items-center space-x-2">
-                  <button className="btn-ghost btn-sm" onClick={() => openEdit(meeting)}>编辑</button>
-                  <button className="btn-ghost btn-sm text-red-600" onClick={() => handleDelete(meeting.id)}>删除</button>
+                  <button className="btn-ghost btn-sm active:scale-[0.97] transition-all duration-200" onClick={() => openEdit(meeting)}>编辑</button>
+                  <button className="btn-ghost btn-sm text-red-400 active:scale-[0.97] transition-all duration-200" onClick={() => handleDelete(meeting.id)}>删除</button>
                 </div>
               </div>
 
@@ -311,9 +312,9 @@ TODO / 待办：
                 {/* Meeting content */}
                 {meeting.content && (
                   <div>
-                    <h4 className="text-sm font-semibold text-gray-900 mb-2">会议内容</h4>
-                    <div className="p-3 bg-gray-50 rounded-lg">
-                      <p className="text-sm text-gray-700 whitespace-pre-wrap">{meeting.content}</p>
+                    <h4 className="text-sm font-semibold text-foreground mb-2">会议内容</h4>
+                    <div className="p-3 bg-muted/50 rounded-xl">
+                      <p className="text-sm text-foreground whitespace-pre-wrap">{meeting.content}</p>
                     </div>
                   </div>
                 )}
@@ -321,17 +322,17 @@ TODO / 待办：
                 {/* Notes */}
                 {meeting.notes && (
                   <div>
-                    <h4 className="text-sm font-semibold text-gray-900 mb-2">备注</h4>
-                    <p className="text-sm text-gray-700 whitespace-pre-wrap">{meeting.notes}</p>
+                    <h4 className="text-sm font-semibold text-foreground mb-2">备注</h4>
+                    <p className="text-sm text-foreground whitespace-pre-wrap">{meeting.notes}</p>
                   </div>
                 )}
 
                 {/* Task extraction */}
                 <div>
                   <div className="flex items-center justify-between mb-3">
-                    <h4 className="text-sm font-semibold text-gray-900">拆解任务</h4>
-                    <button className="btn-secondary btn-sm" onClick={handleAutoExtract}>
-                      🔄 自动提取
+                    <h4 className="text-sm font-semibold text-foreground">拆解任务</h4>
+                    <button className="btn-secondary btn-sm active:scale-[0.97] transition-all duration-200 flex items-center gap-1" onClick={handleAutoExtract}>
+                      <RefreshCw className="w-4 h-4" />自动提取
                     </button>
                   </div>
 
@@ -344,7 +345,7 @@ TODO / 待办：
                       onChange={(e) => setTaskForm({ ...taskForm, description: e.target.value })}
                     />
                     <button
-                      className="btn-primary btn-sm"
+                      className="btn-primary btn-sm active:scale-[0.97] transition-all duration-200"
                       onClick={handleAddExtractedTask}
                       disabled={!taskForm.description.trim()}
                     >添加</button>
@@ -353,29 +354,29 @@ TODO / 待办：
                   {/* Extracted tasks list */}
                   <div className="space-y-2">
                     {extractedTasks.length === 0 ? (
-                      <p className="text-sm text-gray-400 text-center py-4">
+                      <p className="text-sm text-muted-foreground text-center py-4">
                         暂无拆解任务，点击"自动提取"从会议内容中提取，或手动添加
                       </p>
                     ) : (
                       extractedTasks.map((et) => (
-                        <div key={et.id} className="flex items-center justify-between p-2.5 bg-gray-50 rounded-lg group">
+                        <div key={et.id} className="flex items-center justify-between p-2.5 bg-muted/50 rounded-xl group hover:bg-green-500/10 border border-transparent hover:border-green-500/20 transition-colors">
                           <div className="flex items-center space-x-2 flex-1 min-w-0">
-                            <span className="text-sm text-gray-700 truncate">{et.description}</span>
+                            <span className="text-sm text-foreground truncate">{et.description}</span>
                             {et.taskCreated && (
-                              <span className="badge bg-green-100 text-green-700 text-xs">已创建</span>
+                              <span className="badge bg-green-500/20 text-green-400 text-xs">已创建</span>
                             )}
                           </div>
-                          <div className="flex items-center space-x-1 opacity-0 group-hover:opacity-100 transition-opacity">
+                          <div className="flex items-center space-x-1 opacity-0 group-hover:opacity-100 transition-opacity duration-200">
                             {!et.taskCreated && (
                               <button
-                                className="btn-ghost btn-sm text-xs text-primary-600"
+                                className="btn-ghost btn-sm text-xs text-indigo-400 active:scale-[0.97] transition-all duration-200"
                                 onClick={() => handleCreateTask(et)}
                               >
                                 创建任务
                               </button>
                             )}
                             <button
-                              className="btn-ghost btn-sm text-xs text-red-600"
+                              className="btn-ghost btn-sm text-xs text-red-400 active:scale-[0.97] transition-all duration-200"
                               onClick={() => handleDeleteExtractedTask(et.id)}
                             >
                               删除

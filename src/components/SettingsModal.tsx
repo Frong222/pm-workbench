@@ -18,7 +18,7 @@ const SettingsModal: React.FC<{ isOpen: boolean; onClose: () => void }> = ({ isO
       title="云端同步设置 (WebDAV)"
       footer={
         <div className="flex items-center justify-between w-full">
-          <div className="flex items-center space-x-2">
+          <div className="flex items-center gap-2">
             <button
               className="btn-secondary btn-sm"
               disabled={syncing}
@@ -30,14 +30,14 @@ const SettingsModal: React.FC<{ isOpen: boolean; onClose: () => void }> = ({ isO
               测试连接
             </button>
             <button
-              className="btn-primary"
+              className="btn-primary btn-sm"
               disabled={syncing}
               onClick={downloadFromCloud}
             >
               从云端恢复
             </button>
             <button
-              className="btn-primary bg-green-600 hover:bg-green-700"
+              className="btn-primary btn-sm"
               disabled={syncing}
               onClick={uploadToCloud}
             >
@@ -45,13 +45,20 @@ const SettingsModal: React.FC<{ isOpen: boolean; onClose: () => void }> = ({ isO
             </button>
           </div>
           <button className="btn-secondary" onClick={onClose}>
-            取消
+            关闭
           </button>
         </div>
       }
     >
       <div className="space-y-4">
-        <div className="text-sm text-gray-500 mb-2 p-3 bg-blue-50 border border-blue-200 rounded-lg">
+        <div
+          className="text-sm p-3 rounded-xl"
+          style={{
+            background: 'rgba(96, 165, 250, 0.08)',
+            border: '1px solid rgba(96, 165, 250, 0.15)',
+            color: '#60a5fa',
+          }}
+        >
           <p>支持 WebDAV 协议，以下云盘可用：</p>
           <ul className="list-disc ml-5 mt-1">
             <li>坚果云 WebDAV</li>
@@ -60,17 +67,17 @@ const SettingsModal: React.FC<{ isOpen: boolean; onClose: () => void }> = ({ isO
           </ul>
         </div>
         <div>
-          <label className="block text-sm font-medium text-gray-700 mb-1">WebDAV 地址</label>
+          <label className="block text-sm font-medium text-foreground mb-1">WebDAV 地址</label>
           <input
             className="input"
             placeholder="https://dav.jianguoyun.com/dav/你的目录/"
             value={form.webdavUrl}
             onChange={(e) => setForm({ ...form, webdavUrl: e.target.value })}
           />
-          <p className="text-xs text-gray-400 mt-1">地址需要包含 https://，结尾不需要 /v1，会自动拼接</p>
+          <p className="text-xs text-muted-foreground mt-1">地址需要包含 https://，结尾不需要 /v1，会自动拼接</p>
         </div>
         <div>
-          <label className="block text-sm font-medium text-gray-700 mb-1">用户名 / 账号</label>
+          <label className="block text-sm font-medium text-foreground mb-1">用户名 / 账号</label>
           <input
             className="input"
             placeholder="你的用户名"
@@ -79,7 +86,7 @@ const SettingsModal: React.FC<{ isOpen: boolean; onClose: () => void }> = ({ isO
           />
         </div>
         <div>
-          <label className="block text-sm font-medium text-gray-700 mb-1">密码 / 授权码</label>
+          <label className="block text-sm font-medium text-foreground mb-1">密码 / 授权码</label>
           <input
             className="input"
             type="password"
@@ -89,22 +96,41 @@ const SettingsModal: React.FC<{ isOpen: boolean; onClose: () => void }> = ({ isO
           />
         </div>
         <div>
-          <label className="block text-sm font-medium text-gray-700 mb-1">备份路径</label>
+          <label className="block text-sm font-medium text-foreground mb-1">备份路径</label>
           <input
             className="input"
             placeholder="/pm-workbench-backup.json"
             value={form.syncPath}
             onChange={(e) => setForm({ ...form, syncPath: e.target.value })}
           />
-          <p className="text-xs text-gray-400 mt-1">备份文件会保存到这个路径</p>
+          <p className="text-xs text-muted-foreground mt-1">备份文件会保存到这个路径</p>
         </div>
         {syncStatus !== 'idle' && (
-          <div className={`p-3 rounded-lg ${
-            syncStatus === 'success' ? 'bg-green-50 text-green-800 border border-green-200' :
-              syncStatus === 'error' ? 'bg-red-50 text-red-800 border border-red-200' :
-              'bg-blue-50 text-blue-800 border border-blue-200'
-          }`}>
-            <p className="text-sm">{syncMessage}</p>
+          <div
+            className="p-3 rounded-xl text-sm"
+            style={{
+              background:
+                syncStatus === 'success'
+                  ? 'rgba(52, 211, 153, 0.08)'
+                  : syncStatus === 'error'
+                    ? 'rgba(248, 113, 113, 0.08)'
+                    : 'rgba(96, 165, 250, 0.08)',
+              border: `1px solid ${
+                syncStatus === 'success'
+                  ? 'rgba(52, 211, 153, 0.15)'
+                  : syncStatus === 'error'
+                    ? 'rgba(248, 113, 113, 0.15)'
+                    : 'rgba(96, 165, 250, 0.15)'
+              }`,
+              color:
+                syncStatus === 'success'
+                  ? '#34d399'
+                  : syncStatus === 'error'
+                    ? '#f87171'
+                    : '#60a5fa',
+            }}
+          >
+            <p>{syncMessage}</p>
           </div>
         )}
       </div>

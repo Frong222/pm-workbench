@@ -1,13 +1,14 @@
 import { defineConfig } from 'vite'
 import react from '@vitejs/plugin-react'
 import path from 'path'
-import type { IncomingMessage, ServerResponse } from 'http'
+import http from 'http'
+import https from 'https'
 
 function webdavProxyPlugin() {
   return {
     name: 'webdav-proxy',
     configureServer(server: any) {
-      server.middlewares.use('/api/webdav-proxy', async (req: IncomingMessage, res: ServerResponse) => {
+      server.middlewares.use('/api/webdav-proxy', (req: any, res: any) => {
         if (req.method !== 'POST') {
           res.statusCode = 405
           res.end('Method not allowed')
@@ -18,8 +19,7 @@ function webdavProxyPlugin() {
         req.on('data', (chunk: string) => (rawBody += chunk))
         req.on('end', () => {
           try {
-            const parsed = JSON.parse(rawBody)
-            const { targetUrl, method: reqMethod, headers: customHeaders, body: requestBody } = parsed
+            const { targetUrl, method, headers: customHeaders, body: requestBody } = JSON.parse(rawBody)
             if (!targetUrl) {
               res.statusCode = 400
               res.end(JSON.stringify({ error: 'Missing targetUrl' }))
@@ -27,11 +27,10 @@ function webdavProxyPlugin() {
             }
 
             const urlObj = new URL(targetUrl)
-            const httpModule = urlObj.protocol === 'https:' ? await import('https') : await import('http')
-            const mod = httpModule.default || httpModule
+            const httpModule = urlObj.protocol === 'https:' ? https : http
 
-            const options: any = {
-              method: reqMethod || 'GET',
+            const options = {
+              method: method || 'GET',
               hostname: urlObj.hostname,
               port: urlObj.port || (urlObj.protocol === 'https:' ? 443 : 80),
               path: urlObj.pathname + urlObj.search,
@@ -39,9 +38,9 @@ function webdavProxyPlugin() {
                 ...customHeaders,
                 'Content-Type': 'application/json',
               },
-            }
+            } as any
 
-            const proxyReq = mod.request(options, (proxyRes: any) => {
+            const proxyReq = httpModule.request(options, (proxyRes: any) => {
               let data = ''
               proxyRes.on('data', (chunk: any) => (data += chunk))
               proxyRes.on('end', () => {

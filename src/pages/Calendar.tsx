@@ -15,6 +15,7 @@ import {
   getMinutes,
 } from 'date-fns'
 import { zhCN } from 'date-fns/locale'
+import { ListTodo } from 'lucide-react'
 import { useCalendarStore } from '@/store/calendarStore'
 import { useTaskStore } from '@/store/taskStore'
 import Modal from '@/components/Modal'
@@ -152,22 +153,30 @@ const Calendar: React.FC = () => {
     1440: '1天前',
   }
 
+  if (loading) {
+    return (
+      <div className="flex items-center justify-center py-20">
+        <div className="dot-loading" />
+      </div>
+    )
+  }
+
   return (
     <div className="space-y-6">
-      <div className="flex items-center justify-between">
-        <h2 className="text-2xl font-semibold text-gray-900">日程安排</h2>
-        <div className="flex items-center space-x-2">
-          <div className="bg-gray-100 rounded-lg p-0.5 flex">
+      <div className="flex items-center justify-between gap-4 flex-wrap">
+        <h2 className="section-title">日程安排</h2>
+        <div className="flex items-center gap-2 flex-wrap">
+          <div className="segmented-control">
             <button
-              className={`px-3 py-1.5 text-sm rounded-md transition-colors ${viewMode === 'month' ? 'bg-white shadow-sm' : 'text-gray-600'}`}
+              className={`segmented-item ${viewMode === 'month' ? 'active' : ''}`}
               onClick={() => setViewMode('month')}
             >月</button>
             <button
-              className={`px-3 py-1.5 text-sm rounded-md transition-colors ${viewMode === 'week' ? 'bg-white shadow-sm' : 'text-gray-600'}`}
+              className={`segmented-item ${viewMode === 'week' ? 'active' : ''}`}
               onClick={() => setViewMode('week')}
             >周</button>
           </div>
-          <button className="btn-primary" onClick={() => openNew()}>+ 新建事件</button>
+          <button className="btn-primary shrink-0" onClick={() => openNew()}>+ 新建事件</button>
         </div>
       </div>
 
@@ -175,7 +184,7 @@ const Calendar: React.FC = () => {
       <div className="flex items-center justify-between">
         <div className="flex items-center space-x-3">
           <button className="btn-ghost btn-sm" onClick={prev}>←</button>
-          <h3 className="text-lg font-semibold">
+          <h3 className="text-lg font-semibold text-foreground">
             {viewMode === 'month'
               ? format(currentDate, 'yyyy年 M月', { locale: zhCN })
               : `${format(weekStart, 'M月d日', { locale: zhCN })} - ${format(addDays(weekStart, 6), 'M月d日', { locale: zhCN })}`}
@@ -188,9 +197,9 @@ const Calendar: React.FC = () => {
       {/* Month View */}
       {viewMode === 'month' && (
         <div className="card overflow-hidden">
-          <div className="grid grid-cols-7 border-b border-gray-200">
+          <div className="grid grid-cols-7 border-b border-border">
             {['一', '二', '三', '四', '五', '六', '日'].map((d) => (
-              <div key={d} className="px-3 py-2 text-sm font-medium text-gray-500 text-center">
+              <div key={d} className="px-3 py-2 text-sm font-medium text-muted-foreground text-center">
                 {d}
               </div>
             ))}
@@ -205,17 +214,24 @@ const Calendar: React.FC = () => {
               return (
                 <div
                   key={idx}
-                  className={`min-h-[100px] border-b border-r border-gray-50 p-1 cursor-pointer transition-colors hover:bg-gray-50 ${
-                    !isCurrentMonth ? 'bg-gray-50/50' : ''
-                  } ${isSelected ? 'ring-2 ring-primary-500 ring-inset' : ''}`}
+                  className={`min-h-[100px] border-b border-r border-border p-1 cursor-pointer transition-all duration-200 hover:bg-white/[0.04] ${
+                    isSelected ? 'ring-2 ring-indigo-500 ring-inset' : ''
+                  }`}
+                  style={{
+                    backgroundColor: isTodayDate
+                      ? 'rgba(52,211,153,0.08)'
+                      : !isCurrentMonth
+                      ? 'rgba(255,255,255,0.01)'
+                      : 'rgba(255,255,255,0.02)',
+                  }}
                   onClick={() => {
                     setSelectedDate(date)
                     setViewMode('week')
                   }}
                   onDoubleClick={() => openNew(date)}
                 >
-                  <div className={`text-sm font-medium mb-1 w-7 h-7 flex items-center justify-center rounded-full ${
-                    isTodayDate ? 'bg-primary-500 text-white' : isCurrentMonth ? 'text-gray-900' : 'text-gray-400'
+                  <div className={`text-sm font-medium mb-1 w-7 h-7 flex items-center justify-center rounded-full transition-all duration-200 ${
+                    isTodayDate ? 'bg-indigo-500 text-white' : isCurrentMonth ? 'text-foreground' : 'text-muted-foreground'
                   }`}>
                     {format(date, 'd')}
                   </div>
@@ -223,8 +239,8 @@ const Calendar: React.FC = () => {
                     {dayEvents.slice(0, 3).map((event) => (
                       <div
                         key={event.id}
-                        className="text-xs px-1.5 py-0.5 rounded truncate text-white cursor-pointer"
-                        style={{ backgroundColor: event.color }}
+                        className="text-xs px-1.5 py-0.5 rounded truncate text-foreground cursor-pointer transition-all duration-200 hover:bg-white/[0.04] bg-white/[0.03] border-l-2"
+                        style={{ borderLeftColor: event.color }}
                         onClick={(e) => {
                           e.stopPropagation()
                           openEdit(event)
@@ -234,11 +250,11 @@ const Calendar: React.FC = () => {
                       </div>
                     ))}
                     {dayEvents.length > 3 && (
-                      <div className="text-xs text-gray-400 px-1">+{dayEvents.length - 3} 更多</div>
+                      <div className="text-xs text-muted-foreground px-1">+{dayEvents.length - 3} 更多</div>
                     )}
                     {dayTasks.map((task) => (
-                      <div key={task.id} className="text-xs px-1.5 py-0.5 rounded bg-orange-100 text-orange-700 truncate">
-                        📋 {task.title}
+                      <div key={task.id} className="badge text-xs truncate flex items-center">
+                        <ListTodo className="w-3 h-3 mr-1" />{task.title}
                       </div>
                     ))}
                   </div>
@@ -252,12 +268,12 @@ const Calendar: React.FC = () => {
       {/* Week View */}
       {viewMode === 'week' && (
         <div className="card overflow-hidden">
-          <div className="grid grid-cols-7 border-b border-gray-200">
+          <div className="grid grid-cols-7 border-b border-border">
             {weekDays.map((date, idx) => (
-              <div key={idx} className="px-3 py-2 text-center border-r border-gray-50">
-                <div className="text-sm font-medium text-gray-500">{format(date, 'EEE', { locale: zhCN })}</div>
-                <div className={`text-lg font-semibold mt-1 w-8 h-8 mx-auto flex items-center justify-center rounded-full ${
-                  isToday(date) ? 'bg-primary-500 text-white' : 'text-gray-900'
+              <div key={idx} className="px-3 py-2 text-center border-r border-border">
+                <div className="text-sm font-medium text-muted-foreground">{format(date, 'EEE', { locale: zhCN })}</div>
+                <div className={`text-lg font-semibold mt-1 w-8 h-8 mx-auto flex items-center justify-center rounded-full transition-all duration-200 ${
+                  isToday(date) ? 'bg-indigo-500 text-white' : 'text-foreground'
                 }`}>
                   {format(date, 'd')}
                 </div>
@@ -269,15 +285,16 @@ const Calendar: React.FC = () => {
               const dayEvents = getEventsForDay(date)
               const dayTasks = getTasksForDay(date)
               return (
-                <div key={idx} className="min-h-[300px] border-r border-gray-50 p-1 cursor-pointer hover:bg-gray-50"
+                <div key={idx} className="min-h-[300px] border-r border-border p-1 cursor-pointer transition-all duration-200 hover:bg-white/[0.04]"
+                  style={{ backgroundColor: isToday(date) ? 'rgba(52,211,153,0.08)' : 'rgba(255,255,255,0.02)' }}
                   onClick={() => openNew(date)}
                 >
                   <div className="space-y-1 mt-1">
                     {dayEvents.map((event) => (
                       <div
                         key={event.id}
-                        className="text-xs px-1.5 py-1 rounded text-white cursor-pointer"
-                        style={{ backgroundColor: event.color }}
+                        className="text-xs px-1.5 py-1 rounded text-foreground cursor-pointer transition-all duration-200 hover:bg-white/[0.04] bg-white/[0.05] border border-white/[0.06] border-l-[3px]"
+                        style={{ borderLeftColor: event.color }}
                         onClick={(e) => {
                           e.stopPropagation()
                           openEdit(event)
@@ -292,8 +309,8 @@ const Calendar: React.FC = () => {
                       </div>
                     ))}
                     {dayTasks.map((task) => (
-                      <div key={task.id} className="text-xs px-1.5 py-1 rounded bg-orange-50 text-orange-700 border border-orange-200">
-                        📋 {task.title}
+                      <div key={task.id} className="badge text-xs flex items-center">
+                        <ListTodo className="w-3 h-3 mr-1" />{task.title}
                       </div>
                     ))}
                   </div>
@@ -306,23 +323,23 @@ const Calendar: React.FC = () => {
 
       {/* Today's events list */}
       <div className="card p-4">
-        <h3 className="font-semibold text-gray-900 mb-3">今日事件</h3>
+        <h3 className="font-semibold text-foreground mb-3">今日事件</h3>
         <div className="space-y-2">
           {getEventsForDay(new Date()).length === 0 ? (
-            <p className="text-gray-500 text-sm">今日暂无事件</p>
+            <p className="text-muted-foreground text-sm">今日暂无事件</p>
           ) : (
             getEventsForDay(new Date()).map((event) => (
-              <div key={event.id} className="flex items-center justify-between p-2 bg-gray-50 rounded-lg">
+              <div key={event.id} className="flex items-center justify-between p-3 bg-white/[0.03] rounded-xl transition-all duration-200 hover:bg-white/[0.05] border border-white/[0.06] border-l-[3px]" style={{ borderLeftColor: event.color }}>
                 <div className="flex items-center space-x-3">
-                  <div className="w-2 h-2 rounded-full" style={{ backgroundColor: event.color }} />
+                  <div className="w-2 h-2 rounded-full shrink-0" style={{ backgroundColor: event.color }} />
                   <div>
-                    <span className="font-medium text-gray-900 text-sm">{event.title}</span>
-                    <span className="text-xs text-gray-500 ml-2">
+                    <span className="font-medium text-foreground text-sm">{event.title}</span>
+                    <span className="text-xs text-muted-foreground ml-2">
                       {format(new Date(event.startTime), 'HH:mm')}-{format(new Date(event.endTime), 'HH:mm')}
                     </span>
                   </div>
                 </div>
-                <button className="btn-ghost btn-sm text-red-600" onClick={() => handleDelete(event.id)}>删除</button>
+                <button className="btn-destructive btn-sm" onClick={() => handleDelete(event.id)}>删除</button>
               </div>
             ))
           )}
@@ -337,7 +354,7 @@ const Calendar: React.FC = () => {
         footer={
           <>
             {editingEvent && (
-              <button className="btn-secondary text-red-600" onClick={() => { handleDelete(editingEvent); setShowModal(false) }}>删除</button>
+              <button className="btn-destructive btn-sm" onClick={() => { handleDelete(editingEvent); setShowModal(false) }}>删除</button>
             )}
             <div className="flex-1" />
             <button className="btn-secondary" onClick={() => setShowModal(false)}>取消</button>
@@ -347,29 +364,29 @@ const Calendar: React.FC = () => {
       >
         <div className="space-y-4">
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">标题 *</label>
+            <label className="block text-sm font-medium text-foreground mb-1">标题 *</label>
             <input className="input" placeholder="事件标题" value={form.title}
               onChange={(e) => setForm({ ...form, title: e.target.value })} autoFocus />
           </div>
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">描述</label>
+            <label className="block text-sm font-medium text-foreground mb-1">描述</label>
             <textarea className="input min-h-[60px]" placeholder="事件描述" value={form.description}
               onChange={(e) => setForm({ ...form, description: e.target.value })} />
           </div>
           <div className="flex items-center space-x-2">
             <input type="checkbox" id="isAllDay" checked={form.isAllDay}
               onChange={(e) => setForm({ ...form, isAllDay: e.target.checked })} />
-            <label htmlFor="isAllDay" className="text-sm text-gray-700">全天事件</label>
+            <label htmlFor="isAllDay" className="text-sm text-foreground">全天事件</label>
           </div>
           {!form.isAllDay && (
             <div className="grid grid-cols-2 gap-4">
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">开始时间</label>
+                <label className="block text-sm font-medium text-foreground mb-1">开始时间</label>
                 <input type="datetime-local" className="input" value={form.startTime}
                   onChange={(e) => setForm({ ...form, startTime: e.target.value })} />
               </div>
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">结束时间</label>
+                <label className="block text-sm font-medium text-foreground mb-1">结束时间</label>
                 <input type="datetime-local" className="input" value={form.endTime}
                   onChange={(e) => setForm({ ...form, endTime: e.target.value })} />
               </div>
@@ -377,7 +394,7 @@ const Calendar: React.FC = () => {
           )}
           <div className="grid grid-cols-2 gap-4">
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">提醒</label>
+              <label className="block text-sm font-medium text-foreground mb-1">提醒</label>
               <select className="input" value={form.reminderMinutes}
                 onChange={(e) => setForm({ ...form, reminderMinutes: Number(e.target.value) })}>
                 {[0, 0, 5, 15, 30, 60, 1440].map((v) => (
@@ -386,17 +403,17 @@ const Calendar: React.FC = () => {
               </select>
             </div>
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">颜色</label>
+              <label className="block text-sm font-medium text-foreground mb-1">颜色</label>
               <div className="flex space-x-1">
                 {COLORS.map((c) => (
-                  <button key={c} className={`w-6 h-6 rounded-full border-2 ${form.color === c ? 'border-gray-900' : 'border-transparent'}`}
+                  <button key={c} className={`w-6 h-6 rounded-full border-2 transition-all duration-200 active:scale-[0.97] ${form.color === c ? 'border-foreground ring-2 ring-indigo-500/30' : 'border-border'}`}
                     style={{ backgroundColor: c }} onClick={() => setForm({ ...form, color: c })} />
                 ))}
               </div>
             </div>
           </div>
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">关联任务</label>
+            <label className="block text-sm font-medium text-foreground mb-1">关联任务</label>
             <select className="input" value={form.taskId}
               onChange={(e) => setForm({ ...form, taskId: e.target.value })}>
               <option value="">无</option>

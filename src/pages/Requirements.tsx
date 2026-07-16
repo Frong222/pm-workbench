@@ -124,7 +124,14 @@ const Requirements: React.FC = () => {
     const c = config[key]
     if (!c) return null
     return (
-      <span className="badge" style={{ backgroundColor: c.color, color: (c as any).textColor || '#fff' }}>
+      <span
+        className="badge border"
+        style={{
+          backgroundColor: c.color + '20',
+          color: c.textColor || c.color,
+          borderColor: c.color + '30',
+        }}
+      >
         {c.label}
       </span>
     )
@@ -159,7 +166,7 @@ const Requirements: React.FC = () => {
   if (loading && requirements.length === 0) {
     return (
       <div className="flex items-center justify-center min-h-[60vh]">
-        <div className="text-gray-500">加载中...</div>
+        <div className="dot-loading" />
       </div>
     )
   }
@@ -167,27 +174,23 @@ const Requirements: React.FC = () => {
   return (
     <div className="space-y-6">
       <div className="flex items-center justify-between">
-        <h2 className="text-2xl font-semibold text-gray-900">需求管理</h2>
-        <div className="flex items-center space-x-2">
-          <div className="bg-gray-100 rounded-lg p-0.5 flex">
+        <h2 className="section-title">需求管理</h2>
+        <div className="flex items-center gap-2 flex-wrap">
+          <div className="segmented-control">
             <button
-              className={`px-3 py-1.5 text-sm rounded-md transition-colors ${
-                viewMode === 'list' ? 'bg-white shadow-sm' : 'text-gray-600'
-              }`}
+              className={`segmented-item ${viewMode === 'list' ? 'active' : ''}`}
               onClick={() => setViewMode('list')}
             >
               列表
             </button>
             <button
-              className={`px-3 py-1.5 text-sm rounded-md transition-colors ${
-                viewMode === 'kanban' ? 'bg-white shadow-sm' : 'text-gray-600'
-              }`}
+              className={`segmented-item ${viewMode === 'kanban' ? 'active' : ''}`}
               onClick={() => setViewMode('kanban')}
             >
               看板
             </button>
           </div>
-          <button className="btn-primary" onClick={openNew}>
+          <button className="btn-primary transition-all duration-200 active:scale-[0.97] shrink-0" onClick={openNew}>
             + 新建需求
           </button>
         </div>
@@ -219,7 +222,7 @@ const Requirements: React.FC = () => {
             <option value="P2">P2</option>
             <option value="P3">P3</option>
           </select>
-          <span className="text-sm text-gray-500">共 {filteredRequirements.length} 条</span>
+          <span className="text-sm text-muted-foreground">共 {filteredRequirements.length} 条</span>
         </div>
       )}
 
@@ -228,58 +231,78 @@ const Requirements: React.FC = () => {
         <div className="card overflow-hidden">
           <table className="w-full">
             <thead>
-              <tr className="border-b border-gray-100 bg-gray-50">
-                <th className="text-left px-4 py-3 text-sm font-medium text-gray-600">需求标题</th>
-                <th className="text-left px-4 py-3 text-sm font-medium text-gray-600">优先级</th>
-                <th className="text-left px-4 py-3 text-sm font-medium text-gray-600">状态</th>
-                <th className="text-left px-4 py-3 text-sm font-medium text-gray-600">来源</th>
-                <th className="text-left px-4 py-3 text-sm font-medium text-gray-600">提出人</th>
-                <th className="text-left px-4 py-3 text-sm font-medium text-gray-600">版本</th>
-                <th className="text-right px-4 py-3 text-sm font-medium text-gray-600">操作</th>
+              <tr className="table-header">
+                <th className="text-left px-4 py-3 text-sm font-medium text-muted-foreground">需求标题</th>
+                <th className="text-left px-4 py-3 text-sm font-medium text-muted-foreground">优先级</th>
+                <th className="text-left px-4 py-3 text-sm font-medium text-muted-foreground">状态</th>
+                <th className="text-left px-4 py-3 text-sm font-medium text-muted-foreground">来源</th>
+                <th className="text-left px-4 py-3 text-sm font-medium text-muted-foreground">提出人</th>
+                <th className="text-left px-4 py-3 text-sm font-medium text-muted-foreground">版本</th>
+                <th className="text-right px-4 py-3 text-sm font-medium text-muted-foreground">操作</th>
               </tr>
             </thead>
             <tbody>
               {filteredRequirements.length === 0 ? (
                 <tr>
-                  <td colSpan={7} className="text-center py-12 text-gray-500">
-                    暂无需求，点击"新建需求"开始
+                  <td colSpan={7}>
+                    <div className="empty-state">
+                      <div className="empty-icon">
+                        <svg className="w-12 h-12" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                        </svg>
+                      </div>
+                      <p className="empty-title">暂无需求</p>
+                      <p className="empty-desc">点击"新建需求"开始添加</p>
+                    </div>
                   </td>
                 </tr>
               ) : (
                 filteredRequirements.map((req) => (
-                  <tr
-                    key={req.id}
-                    className="border-b border-gray-50 hover:bg-gray-50 transition-colors"
-                  >
+                  <tr key={req.id} className="table-row">
                     <td className="px-4 py-3">
-                      <span className="font-medium text-gray-900">{req.title}</span>
+                      <span className="font-medium text-foreground">{req.title}</span>
                       {req.module && (
-                        <span className="ml-2 text-xs text-gray-400">[{req.module}]</span>
+                        <span className="tag ml-2">{req.module}</span>
                       )}
                     </td>
                     <td className="px-4 py-3">{getBadge(PriorityConfig, req.priority)}</td>
                     <td className="px-4 py-3">
                       <span
-                        className="badge"
+                        className="badge border"
                         style={{
-                          backgroundColor: RequirementStatusConfig[req.status]?.color || '#e5e7eb',
+                          backgroundColor: (RequirementStatusConfig[req.status]?.color || '#475569') + '20',
+                          color: RequirementStatusConfig[req.status]?.color || '#94a3b8',
+                          borderColor: (RequirementStatusConfig[req.status]?.color || '#475569') + '30',
                         }}
                       >
                         {RequirementStatusConfig[req.status]?.label || req.status}
                       </span>
                     </td>
                     <td className="px-4 py-3">
-                      <span className="badge" style={{ backgroundColor: RequirementSourceConfig[req.source]?.color }}>
+                      <span
+                        className="badge border"
+                        style={{
+                          backgroundColor: (RequirementSourceConfig[req.source]?.color || '#475569') + '20',
+                          color: RequirementSourceConfig[req.source]?.color || '#94a3b8',
+                          borderColor: (RequirementSourceConfig[req.source]?.color || '#475569') + '30',
+                        }}
+                      >
                         {RequirementSourceConfig[req.source]?.label || req.source}
                       </span>
                     </td>
-                    <td className="px-4 py-3 text-sm text-gray-600">{req.proposer || '—'}</td>
-                    <td className="px-4 py-3 text-sm text-gray-600">{req.version || '—'}</td>
+                    <td className="px-4 py-3 text-sm text-muted-foreground">{req.proposer || '—'}</td>
+                    <td className="px-4 py-3 text-sm text-muted-foreground">{req.version || '—'}</td>
                     <td className="px-4 py-3 text-right">
-                      <button className="btn-ghost btn-sm" onClick={() => openEdit(req)}>
+                      <button
+                        className="btn-ghost btn-sm transition-all duration-200 active:scale-[0.97]"
+                        onClick={() => openEdit(req)}
+                      >
                         编辑
                       </button>
-                      <button className="btn-ghost btn-sm text-red-600" onClick={() => handleDelete(req.id)}>
+                      <button
+                        className="btn-destructive btn-sm transition-all duration-200 active:scale-[0.97]"
+                        onClick={() => handleDelete(req.id)}
+                      >
                         删除
                       </button>
                     </td>
@@ -297,8 +320,8 @@ const Requirements: React.FC = () => {
           {kanbanColumns.map((col) => (
             <div key={col.key} className="card p-3">
               <div className="flex items-center justify-between mb-3">
-                <h3 className="font-semibold text-gray-900 text-sm">{col.label}</h3>
-                <span className="badge bg-gray-100 text-gray-600">
+                <h3 className="font-semibold text-foreground text-sm">{col.label}</h3>
+                <span className="badge border" style={{ backgroundColor: '#94a3b820', color: '#94a3b8', borderColor: '#94a3b830' }}>
                   {requirements.filter((r) => r.status === col.key).length}
                 </span>
               </div>
@@ -308,7 +331,7 @@ const Requirements: React.FC = () => {
                   .map((req) => (
                     <div
                       key={req.id}
-                      className="bg-white border border-gray-200 rounded-lg p-2.5 cursor-pointer hover:shadow-sm transition-shadow"
+                      className="kanban-card"
                       onClick={() => {
                         const statusOrder = ['proposed', 'evaluating', 'approved', 'scheduled', 'developing', 'testing', 'delivered']
                         const idx = statusOrder.indexOf(req.status)
@@ -321,14 +344,14 @@ const Requirements: React.FC = () => {
                         {getBadge(PriorityConfig, req.priority)}
                         {getBadge(RequirementSourceConfig, req.source)}
                       </div>
-                      <p className="font-medium text-gray-900 text-xs leading-tight">{req.title}</p>
+                      <p className="font-medium text-foreground text-xs leading-tight">{req.title}</p>
                       {req.proposer && (
-                        <p className="text-xs text-gray-500 mt-1">{req.proposer}</p>
+                        <p className="text-xs text-muted-foreground mt-1">{req.proposer}</p>
                       )}
                     </div>
                   ))}
                 {requirements.filter((r) => r.status === col.key).length === 0 && (
-                  <p className="text-gray-400 text-xs text-center py-4">暂无</p>
+                  <p className="text-muted-foreground text-xs text-center py-4">暂无</p>
                 )}
               </div>
             </div>
@@ -343,10 +366,14 @@ const Requirements: React.FC = () => {
         title={editingReq ? '编辑需求' : '新建需求'}
         footer={
           <>
-            <button className="btn-secondary" onClick={() => setShowModal(false)}>
+            <button className="btn-secondary transition-all duration-200 active:scale-[0.97]" onClick={() => setShowModal(false)}>
               取消
             </button>
-            <button className="btn-primary" onClick={handleSave} disabled={!form.title.trim() || !form.description.trim()}>
+            <button
+              className="btn-primary transition-all duration-200 active:scale-[0.97]"
+              onClick={handleSave}
+              disabled={!form.title.trim() || !form.description.trim()}
+            >
               保存
             </button>
           </>
@@ -354,7 +381,7 @@ const Requirements: React.FC = () => {
       >
         <div className="space-y-4 max-h-[60vh] overflow-y-auto pr-2">
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">需求标题 *</label>
+            <label className="block text-sm font-medium text-foreground mb-1">需求标题 *</label>
             <input
               className="input"
               placeholder="请输入需求标题"
@@ -364,7 +391,7 @@ const Requirements: React.FC = () => {
             />
           </div>
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">需求描述 *</label>
+            <label className="block text-sm font-medium text-foreground mb-1">需求描述 *</label>
             <textarea
               className="input min-h-[80px]"
               placeholder="详细描述需求内容"
@@ -373,7 +400,7 @@ const Requirements: React.FC = () => {
             />
           </div>
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">验收标准</label>
+            <label className="block text-sm font-medium text-foreground mb-1">验收标准</label>
             <textarea
               className="input min-h-[60px]"
               placeholder="描述验收标准/DoD"
@@ -383,7 +410,7 @@ const Requirements: React.FC = () => {
           </div>
           <div className="grid grid-cols-2 gap-4">
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">优先级</label>
+              <label className="block text-sm font-medium text-foreground mb-1">优先级</label>
               <select
                 className="input"
                 value={form.priority}
@@ -396,7 +423,7 @@ const Requirements: React.FC = () => {
               </select>
             </div>
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">状态</label>
+              <label className="block text-sm font-medium text-foreground mb-1">状态</label>
               <select
                 className="input"
                 value={form.status}
@@ -416,7 +443,7 @@ const Requirements: React.FC = () => {
           </div>
           <div className="grid grid-cols-2 gap-4">
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">来源</label>
+              <label className="block text-sm font-medium text-foreground mb-1">来源</label>
               <select
                 className="input"
                 value={form.source}
@@ -432,7 +459,7 @@ const Requirements: React.FC = () => {
               </select>
             </div>
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">提出人</label>
+              <label className="block text-sm font-medium text-foreground mb-1">提出人</label>
               <input
                 className="input"
                 placeholder="提出人姓名"
@@ -443,7 +470,7 @@ const Requirements: React.FC = () => {
           </div>
           <div className="grid grid-cols-2 gap-4">
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">所属项目</label>
+              <label className="block text-sm font-medium text-foreground mb-1">所属项目</label>
               <select
                 className="input"
                 value={form.projectId}
@@ -458,7 +485,7 @@ const Requirements: React.FC = () => {
               </select>
             </div>
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">关联版本</label>
+              <label className="block text-sm font-medium text-foreground mb-1">关联版本</label>
               <input
                 className="input"
                 placeholder="如 v2.0"
@@ -469,7 +496,7 @@ const Requirements: React.FC = () => {
           </div>
           <div className="grid grid-cols-2 gap-4">
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">所属模块</label>
+              <label className="block text-sm font-medium text-foreground mb-1">所属模块</label>
               <input
                 className="input"
                 placeholder="如 用户端"
@@ -478,7 +505,7 @@ const Requirements: React.FC = () => {
               />
             </div>
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">排期信息</label>
+              <label className="block text-sm font-medium text-foreground mb-1">排期信息</label>
               <input
                 className="input"
                 placeholder="预计上线时间"
@@ -488,7 +515,7 @@ const Requirements: React.FC = () => {
             </div>
           </div>
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">评估结果</label>
+            <label className="block text-sm font-medium text-foreground mb-1">评估结果</label>
             <textarea
               className="input min-h-[60px]"
               placeholder="评估结论、技术可行性等"

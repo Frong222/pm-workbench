@@ -96,7 +96,14 @@ const Tasks: React.FC = () => {
   const getPriorityBadge = (priority: string) => {
     const config = PriorityConfig[priority]
     return (
-      <span className="badge" style={{ backgroundColor: config.color, color: config.textColor }}>
+      <span
+        className="badge"
+        style={{
+          backgroundColor: `${config.color}20`,
+          color: config.color,
+          boxShadow: `0 0 6px ${config.color}50`,
+        }}
+      >
         {config.label}
       </span>
     )
@@ -105,7 +112,14 @@ const Tasks: React.FC = () => {
   const getStatusBadge = (status: string) => {
     const config = TaskStatusConfig[status]
     return (
-      <span className="badge" style={{ backgroundColor: config.color }}>
+      <span
+        className="badge"
+        style={{
+          backgroundColor: `${config.color}20`,
+          color: config.color,
+          boxShadow: `0 0 6px ${config.color}50`,
+        }}
+      >
         {config.label}
       </span>
     )
@@ -120,36 +134,33 @@ const Tasks: React.FC = () => {
   if (loading && tasks.length === 0) {
     return (
       <div className="flex items-center justify-center min-h-[60vh]">
-        <div className="text-gray-500">加载中...</div>
+        <div className="flex items-center space-x-2">
+          <div className="dot-loading" />
+        </div>
       </div>
     )
   }
 
   return (
     <div className="space-y-6">
-      <div className="flex items-center justify-between">
-        <h2 className="text-2xl font-semibold text-gray-900">任务管理</h2>
-        <div className="flex items-center space-x-2">
-          {/* View toggle */}
-          <div className="bg-gray-100 rounded-lg p-0.5 flex">
+      <div className="flex items-center justify-between gap-4 flex-wrap">
+        <h2 className="section-title mb-0">任务管理</h2>
+        <div className="flex items-center gap-2 flex-wrap">
+          <div className="segmented-control">
             <button
-              className={`px-3 py-1.5 text-sm rounded-md transition-colors ${
-                viewMode === 'list' ? 'bg-white shadow-sm' : 'text-gray-600'
-              }`}
+              className={`segmented-item${viewMode === 'list' ? ' active' : ''}`}
               onClick={() => setViewMode('list')}
             >
               列表
             </button>
             <button
-              className={`px-3 py-1.5 text-sm rounded-md transition-colors ${
-                viewMode === 'kanban' ? 'bg-white shadow-sm' : 'text-gray-600'
-              }`}
+              className={`segmented-item${viewMode === 'kanban' ? ' active' : ''}`}
               onClick={() => setViewMode('kanban')}
             >
               看板
             </button>
           </div>
-          <button className="btn-primary" onClick={openNew}>
+          <button className="btn-primary transition-all duration-200 active:scale-[0.97] shrink-0" onClick={openNew}>
             + 新建任务
           </button>
         </div>
@@ -178,62 +189,66 @@ const Tasks: React.FC = () => {
             <option value="medium">中</option>
             <option value="low">低</option>
           </select>
-          <span className="text-sm text-gray-500">共 {filteredTasks.length} 条</span>
+          <span className="text-sm text-muted-foreground">共 {filteredTasks.length} 条</span>
         </div>
       )}
 
       {/* List View */}
       {viewMode === 'list' && (
-        <div className="card overflow-hidden">
+        <div className="card card-hover overflow-hidden">
           <table className="w-full">
             <thead>
-              <tr className="border-b border-gray-100 bg-gray-50">
-                <th className="text-left px-4 py-3 text-sm font-medium text-gray-600">标题</th>
-                <th className="text-left px-4 py-3 text-sm font-medium text-gray-600">优先级</th>
-                <th className="text-left px-4 py-3 text-sm font-medium text-gray-600">状态</th>
-                <th className="text-left px-4 py-3 text-sm font-medium text-gray-600">截止日期</th>
-                <th className="text-left px-4 py-3 text-sm font-medium text-gray-600">标签</th>
-                <th className="text-right px-4 py-3 text-sm font-medium text-gray-600">操作</th>
+              <tr className="table-header">
+                <th className="text-left px-4 py-3 text-sm font-medium text-muted-foreground">标题</th>
+                <th className="text-left px-4 py-3 text-sm font-medium text-muted-foreground">优先级</th>
+                <th className="text-left px-4 py-3 text-sm font-medium text-muted-foreground">状态</th>
+                <th className="text-left px-4 py-3 text-sm font-medium text-muted-foreground">截止日期</th>
+                <th className="text-left px-4 py-3 text-sm font-medium text-muted-foreground">标签</th>
+                <th className="text-right px-4 py-3 text-sm font-medium text-muted-foreground">操作</th>
               </tr>
             </thead>
             <tbody>
               {filteredTasks.length === 0 ? (
                 <tr>
-                  <td colSpan={6} className="text-center py-12 text-gray-500">
-                    暂无任务，点击"新建任务"开始
+                  <td colSpan={6}>
+                    <div className="empty-state">
+                      <div className="empty-icon" />
+                      <div className="empty-title">暂无任务</div>
+                      <div className="empty-desc">点击"新建任务"开始创建第一个任务</div>
+                    </div>
                   </td>
                 </tr>
               ) : (
                 filteredTasks.map((task) => (
                   <tr
                     key={task.id}
-                    className="border-b border-gray-50 hover:bg-gray-50 transition-colors"
+                    className="table-row"
                   >
                     <td className="px-4 py-3">
-                      <span className="font-medium text-gray-900">{task.title}</span>
+                      <span className="font-medium text-foreground">{task.title}</span>
                       {task.description && (
-                        <p className="text-xs text-gray-500 mt-0.5 line-clamp-1">{task.description}</p>
+                        <p className="text-xs text-muted-foreground mt-0.5 line-clamp-1">{task.description}</p>
                       )}
                     </td>
                     <td className="px-4 py-3">{getPriorityBadge(task.priority)}</td>
                     <td className="px-4 py-3">{getStatusBadge(task.status)}</td>
-                    <td className="px-4 py-3 text-sm text-gray-600">
+                    <td className="px-4 py-3 text-sm text-muted-foreground">
                       {task.dueDate || '—'}
                     </td>
                     <td className="px-4 py-3">
                       <div className="flex flex-wrap gap-1">
                         {task.tags.map((tag) => (
-                          <span key={tag} className="badge bg-gray-100 text-gray-600">
+                          <span key={tag} className="tag">
                             {tag}
                           </span>
                         ))}
                       </div>
                     </td>
                     <td className="px-4 py-3 text-right">
-                      <button className="btn-ghost btn-sm" onClick={() => openEdit(task)}>
+                      <button className="btn-ghost btn-sm transition-all duration-200 active:scale-[0.97]" onClick={() => openEdit(task)}>
                         编辑
                       </button>
-                      <button className="btn-ghost btn-sm text-red-600" onClick={() => handleDelete(task.id)}>
+                      <button className="btn-ghost btn-sm btn-destructive transition-all duration-200 active:scale-[0.97]" onClick={() => handleDelete(task.id)}>
                         删除
                       </button>
                     </td>
@@ -249,10 +264,17 @@ const Tasks: React.FC = () => {
       {viewMode === 'kanban' && (
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
           {kanbanColumns.map((col) => (
-            <div key={col.key} className="card p-4">
+            <div key={col.key} className="card card-hover p-4">
               <div className="flex items-center justify-between mb-4">
-                <h3 className="font-semibold text-gray-900">{col.label}</h3>
-                <span className="badge" style={{ backgroundColor: col.color }}>
+                <h3 className="font-semibold text-foreground">{col.label}</h3>
+                <span
+                  className="badge"
+                  style={{
+                    backgroundColor: `${col.color}20`,
+                    color: col.color,
+                    boxShadow: `0 0 6px ${col.color}50`,
+                  }}
+                >
                   {tasks.filter((t) => t.status === col.key).length}
                 </span>
               </div>
@@ -262,7 +284,7 @@ const Tasks: React.FC = () => {
                   .map((task) => (
                     <div
                       key={task.id}
-                      className="bg-white border border-gray-200 rounded-lg p-3 cursor-pointer hover:shadow-sm transition-shadow"
+                      className="kanban-card"
                       onClick={() => {
                         const nextStatus =
                           col.key === 'todo'
@@ -276,14 +298,14 @@ const Tasks: React.FC = () => {
                       <div className="flex items-center justify-between mb-2">
                         {getPriorityBadge(task.priority)}
                         {col.key === 'todo' && task.dueDate && (
-                          <span className="text-xs text-gray-500">{task.dueDate}</span>
+                          <span className="text-xs text-muted-foreground">{task.dueDate}</span>
                         )}
                       </div>
-                      <p className="font-medium text-gray-900 text-sm">{task.title}</p>
+                      <p className="font-medium text-foreground text-sm">{task.title}</p>
                       {task.tags.length > 0 && (
                         <div className="flex flex-wrap gap-1 mt-2">
                           {task.tags.map((tag) => (
-                            <span key={tag} className="badge bg-gray-100 text-gray-500 text-xs">
+                            <span key={tag} className="tag text-xs">
                               {tag}
                             </span>
                           ))}
@@ -291,7 +313,7 @@ const Tasks: React.FC = () => {
                       )}
                       <div className="mt-2 flex justify-end">
                         <button
-                          className="btn-ghost btn-sm text-xs"
+                          className="btn-ghost btn-sm text-xs transition-all duration-200 active:scale-[0.97]"
                           onClick={(e) => {
                             e.stopPropagation()
                             openEdit(task)
@@ -303,11 +325,11 @@ const Tasks: React.FC = () => {
                     </div>
                   ))}
                 {tasks.filter((t) => t.status === col.key).length === 0 && (
-                  <p className="text-gray-400 text-sm text-center py-4">暂无任务</p>
+                  <p className="text-muted-foreground text-sm text-center py-4">暂无任务</p>
                 )}
               </div>
               <button
-                className="w-full mt-3 py-2 border-2 border-dashed border-gray-200 rounded-lg text-sm text-gray-500 hover:border-primary-300 hover:text-primary-500 transition-colors"
+                className="w-full mt-3 py-2 border-2 border-dashed border-border rounded-lg text-sm text-muted-foreground hover:border-foreground/30 hover:text-foreground transition-all duration-200 active:scale-[0.97]"
                 onClick={() => {
                   setForm({
                     title: '',
@@ -336,10 +358,10 @@ const Tasks: React.FC = () => {
         title={editingTask ? '编辑任务' : '新建任务'}
         footer={
           <>
-            <button className="btn-secondary" onClick={() => setShowModal(false)}>
+            <button className="btn-secondary transition-all duration-200 active:scale-[0.97]" onClick={() => setShowModal(false)}>
               取消
             </button>
-            <button className="btn-primary" onClick={handleSave} disabled={!form.title.trim()}>
+            <button className="btn-primary transition-all duration-200 active:scale-[0.97]" onClick={handleSave} disabled={!form.title.trim()}>
               保存
             </button>
           </>
@@ -347,7 +369,7 @@ const Tasks: React.FC = () => {
       >
         <div className="space-y-4">
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">标题 *</label>
+            <label className="block text-sm font-medium text-foreground mb-1">标题 *</label>
             <input
               className="input"
               placeholder="请输入任务标题"
@@ -357,7 +379,7 @@ const Tasks: React.FC = () => {
             />
           </div>
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">描述</label>
+            <label className="block text-sm font-medium text-foreground mb-1">描述</label>
             <textarea
               className="input min-h-[80px]"
               placeholder="输入任务描述"
@@ -367,7 +389,7 @@ const Tasks: React.FC = () => {
           </div>
           <div className="grid grid-cols-2 gap-4">
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">优先级</label>
+              <label className="block text-sm font-medium text-foreground mb-1">优先级</label>
               <select
                 className="input"
                 value={form.priority}
@@ -379,7 +401,7 @@ const Tasks: React.FC = () => {
               </select>
             </div>
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">状态</label>
+              <label className="block text-sm font-medium text-foreground mb-1">状态</label>
               <select
                 className="input"
                 value={form.status}
@@ -392,7 +414,7 @@ const Tasks: React.FC = () => {
             </div>
           </div>
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">截止日期</label>
+            <label className="block text-sm font-medium text-foreground mb-1">截止日期</label>
             <input
               type="date"
               className="input"
@@ -401,7 +423,7 @@ const Tasks: React.FC = () => {
             />
           </div>
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">标签（逗号分隔）</label>
+            <label className="block text-sm font-medium text-foreground mb-1">标签（逗号分隔）</label>
             <input
               className="input"
               placeholder="如: 评审, 文档, 调研"
@@ -410,7 +432,7 @@ const Tasks: React.FC = () => {
             />
           </div>
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">所属项目</label>
+            <label className="block text-sm font-medium text-foreground mb-1">所属项目</label>
             <select
               className="input"
               value={form.projectId}

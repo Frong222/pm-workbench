@@ -15,19 +15,26 @@ const Modal: React.FC<ModalProps> = ({ isOpen, onClose, title, children, footer 
   return ReactDOM.createPortal(
     <div className="modal-overlay" onClick={onClose}>
       <div className="modal-content" onClick={(e) => e.stopPropagation()}>
-        <div className="flex items-center justify-between p-4 border-b border-gray-200">
-          <h3 className="text-lg font-semibold">{title}</h3>
+        <div className="flex items-center justify-between px-6 py-5" style={{ borderBottom: '1px solid rgba(255,255,255,0.06)' }}>
+          <h3 className="text-base font-semibold text-foreground">{title}</h3>
           <button
             onClick={onClose}
-            className="text-gray-400 hover:text-gray-600 transition-colors"
+            className="btn-ghost btn-icon rounded-lg"
           >
-            <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <svg className="w-5 h-5 text-muted-foreground" fill="none" viewBox="0 0 24 24" stroke="currentColor">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
             </svg>
           </button>
         </div>
-        <div className="p-4">{children}</div>
-        {footer && <div className="px-4 pb-4 flex justify-end space-x-2">{footer}</div>}
+        <div className="px-6 py-5">{children}</div>
+        {footer && (
+          <div className="flex items-center justify-end gap-2 px-6 py-4" style={{
+            borderTop: '1px solid rgba(255,255,255,0.06)',
+            background: 'rgba(255,255,255,0.02)',
+          }}>
+            {footer}
+          </div>
+        )}
       </div>
     </div>,
     document.body

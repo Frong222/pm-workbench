@@ -1,5 +1,6 @@
 import React, { useEffect, useState, useCallback, useRef } from 'react'
 import { format } from 'date-fns'
+import { FolderOpen, FileText, Folder, BookOpen } from 'lucide-react'
 import { useNoteStore } from '@/store/noteStore'
 import Modal from '@/components/Modal'
 
@@ -151,49 +152,49 @@ const Knowledge: React.FC = () => {
       .replace(/# (.+)/g, '<h1 class="text-2xl font-bold mt-6 mb-3">$1</h1>')
       .replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>')
       .replace(/\*(.+?)\*/g, '<em>$1</em>')
-      .replace(/`(.+?)`/g, '<code class="bg-gray-100 px-1 rounded text-sm">$1</code>')
-      .replace(/- (.+)/g, '<li class="ml-4 list-disc text-gray-700">$1</li>')
-      .replace(/\d+\. (.+)/g, '<li class="ml-4 list-decimal text-gray-700">$1</li>')
-      .replace(/\[(.*?)\]\((.*?)\)/g, '<a href="$2" class="text-primary-500 underline">$1</a>')
-      .replace(/\n\n/g, '</p><p class="text-gray-700 mb-2">')
+      .replace(/`(.+?)`/g, '<code class="bg-muted px-1 rounded text-sm">$1</code>')
+      .replace(/- (.+)/g, '<li class="ml-4 list-disc text-muted-foreground">$1</li>')
+      .replace(/\d+\. (.+)/g, '<li class="ml-4 list-decimal text-muted-foreground">$1</li>')
+      .replace(/\[(.*?)\]\((.*?)\)/g, '<a href="$2" class="text-indigo-500 underline">$1</a>')
+      .replace(/\n\n/g, '</p><p class="text-muted-foreground mb-2">')
       .replace(/\n/g, '<br/>')
-    html = '<p class="text-gray-700 mb-2">' + html + '</p>'
+    html = '<p class="text-muted-foreground mb-2">' + html + '</p>'
     return html
   }
 
   return (
     <div className="space-y-6">
       <div className="flex items-center justify-between">
-        <h2 className="text-2xl font-semibold text-gray-900">知识库</h2>
-        <button className="btn-primary" onClick={openNewNote}>+ 新建笔记</button>
+        <h2 className="section-title">知识库</h2>
+        <button className="btn-primary active:scale-[0.97] transition-all duration-200" onClick={openNewNote}>+ 新建笔记</button>
       </div>
 
       <div className="flex space-x-4">
         {/* Left sidebar */}
         <div className="w-48 shrink-0 space-y-4">
           {/* Folders */}
-          <div className="card p-3">
-            <div className="flex items-center justify-between mb-2">
-              <h4 className="text-sm font-semibold text-gray-900">文件夹</h4>
-              <button className="btn-ghost btn-sm text-xs" onClick={handleAddFolder}>+</button>
+          <div className="card p-4">
+            <div className="flex items-center justify-between mb-3">
+              <h4 className="text-sm font-semibold text-foreground">文件夹</h4>
+              <button className="btn-ghost btn-sm text-xs active:scale-[0.97] transition-all duration-200" onClick={handleAddFolder}>+</button>
             </div>
-            <div className="space-y-0.5">
+            <div className="space-y-1">
               <button
-                className={`w-full text-left px-2 py-1.5 text-sm rounded ${!selectedFolderId ? 'bg-primary-50 text-primary-600' : 'text-gray-700 hover:bg-gray-100'}`}
+                className={`w-full text-left px-3 py-2 text-sm rounded-xl transition-all duration-200 flex items-center gap-2 ${!selectedFolderId ? 'bg-emerald-500/10 text-emerald-400 shadow-sm' : 'text-muted-foreground hover:bg-white/[0.04]'}`}
                 onClick={() => setSelectedFolderId(null)}
-              >📂 全部</button>
+              ><FolderOpen className="w-4 h-4" />全部</button>
               <button
-                className={`w-full text-left px-2 py-1.5 text-sm rounded ${selectedFolderId === '__uncategorized' ? 'bg-primary-50 text-primary-600' : 'text-gray-700 hover:bg-gray-100'}`}
+                className={`w-full text-left px-3 py-2 text-sm rounded-xl transition-all duration-200 flex items-center gap-2 ${selectedFolderId === '__uncategorized' ? 'bg-emerald-500/10 text-emerald-400 shadow-sm' : 'text-muted-foreground hover:bg-white/[0.04]'}`}
                 onClick={() => setSelectedFolderId('__uncategorized')}
-              >📄 未分类</button>
+              ><FileText className="w-4 h-4" />未分类</button>
               {folders.map((folder) => (
                 <div key={folder.id} className="flex items-center group">
                   <button
-                    className={`flex-1 text-left px-2 py-1.5 text-sm rounded ${selectedFolderId === folder.id ? 'bg-primary-50 text-primary-600' : 'text-gray-700 hover:bg-gray-100'}`}
+                    className={`flex-1 text-left px-3 py-2 text-sm rounded-xl transition-all duration-200 flex items-center gap-2 ${selectedFolderId === folder.id ? 'bg-emerald-500/10 text-emerald-400 shadow-sm' : 'text-muted-foreground hover:bg-white/[0.04]'}`}
                     onClick={() => setSelectedFolderId(folder.id)}
-                  >📁 {folder.name}</button>
+                  ><Folder className="w-4 h-4" />{folder.name}</button>
                   <button
-                    className="opacity-0 group-hover:opacity-100 text-xs text-gray-400 hover:text-red-500 px-1"
+                    className="opacity-0 group-hover:opacity-100 text-xs text-muted-foreground hover:text-red-500 transition-all duration-200 px-1"
                     onClick={() => handleDeleteFolder(folder.id)}
                   >✕</button>
                 </div>
@@ -205,7 +206,7 @@ const Knowledge: React.FC = () => {
         {/* Note list */}
         <div className="w-64 shrink-0">
           <div className="card overflow-hidden">
-            <div className="p-2 border-b border-gray-100">
+            <div className="p-2 border-b border-border">
               <input
                 className="input text-sm py-1.5"
                 placeholder="搜索笔记..."
@@ -215,22 +216,24 @@ const Knowledge: React.FC = () => {
             </div>
             <div className="max-h-[calc(100vh-280px)] overflow-y-auto">
               {filteredNotes.length === 0 ? (
-                <div className="text-center py-8 text-gray-500 text-sm">暂无笔记</div>
+                <div className="empty-state py-8">
+                  <p className="empty-title text-sm">暂无笔记</p>
+                </div>
               ) : (
                 filteredNotes.map((note) => (
                   <div
                     key={note.id}
-                    className={`px-3 py-2.5 cursor-pointer border-b border-gray-50 hover:bg-gray-50 transition-colors ${
-                      selectedNoteId === note.id ? 'bg-primary-50' : ''
+                    className={`px-4 py-3 cursor-pointer border-b border-border/50 card-hover transition-all duration-200 ${
+                      selectedNoteId === note.id ? 'bg-emerald-500/10' : ''
                     }`}
                     onClick={() => selectNote(note)}
                   >
-                    <p className="font-medium text-sm text-gray-900 truncate">{note.title}</p>
-                    <p className="text-xs text-gray-500 mt-0.5">{format(new Date(note.updatedAt), 'MM-dd HH:mm')}</p>
+                    <p className="font-medium text-sm text-foreground truncate">{note.title}</p>
+                    <p className="text-xs text-muted-foreground mt-0.5">{format(new Date(note.updatedAt), 'MM-dd HH:mm')}</p>
                     {note.tags.length > 0 && (
-                      <div className="flex flex-wrap gap-1 mt-1">
+                      <div className="flex flex-wrap gap-1 mt-1.5">
                         {note.tags.slice(0, 3).map((tag) => (
-                          <span key={tag} className="badge bg-gray-100 text-gray-500 text-xs">{tag}</span>
+                          <span key={tag} className="tag">{tag}</span>
                         ))}
                       </div>
                     )}
@@ -246,24 +249,24 @@ const Knowledge: React.FC = () => {
           {selectedNote ? (
             <div className="flex flex-col h-full">
               {/* Toolbar */}
-              <div className="flex items-center justify-between px-4 py-2 border-b border-gray-200 bg-gray-50">
-                <div className="flex items-center space-x-2">
+              <div className="flex items-center justify-between px-4 py-2 border-b border-white/[0.06] bg-white/[0.02]">
+                <div className="flex items-center space-x-1">
                   <button
-                    className={`btn-ghost btn-sm text-xs ${showPreview ? 'bg-white shadow-sm' : ''}`}
+                    className={`btn-ghost btn-sm text-xs transition-all duration-200 active:scale-[0.97] ${showPreview ? 'bg-card shadow-sm' : ''}`}
                     onClick={() => setShowPreview(true)}
                   >预览</button>
                   <button
-                    className={`btn-ghost btn-sm text-xs ${!showPreview ? 'bg-white shadow-sm' : ''}`}
+                    className={`btn-ghost btn-sm text-xs transition-all duration-200 active:scale-[0.97] ${!showPreview ? 'bg-card shadow-sm' : ''}`}
                     onClick={() => setShowPreview(false)}
                   >编辑</button>
                 </div>
                 <div className="flex items-center space-x-2">
-                  <button className="btn-ghost btn-sm text-xs text-red-600" onClick={() => setShowDeleteConfirm(true)}>删除</button>
+                  <button className="btn-ghost btn-sm text-xs text-red-500 hover:text-red-600 transition-all duration-200 active:scale-[0.97]" onClick={() => setShowDeleteConfirm(true)}>删除</button>
                 </div>
               </div>
 
               {/* Meta */}
-              <div className="px-4 py-2 border-b border-gray-100 space-y-2 bg-gray-50/50">
+              <div className="px-4 py-3 border-b border-white/[0.06] space-y-3 bg-white/[0.02]">
                 <input
                   className="input text-sm py-1.5 font-semibold"
                   placeholder="笔记标题"
@@ -299,19 +302,13 @@ const Knowledge: React.FC = () => {
                       dangerouslySetInnerHTML={{ __html: renderMarkdown(editContent) }}
                     />
                     {!editContent && (
-                      <p className="text-gray-400 text-sm mt-4">暂无内容，切换到编辑模式开始写笔记...</p>
+                      <p className="text-muted-foreground text-sm mt-4">暂无内容，切换到编辑模式开始写笔记...</p>
                     )}
                   </div>
                 ) : (
                   <textarea
-                    className="flex-1 p-4 text-sm font-mono leading-relaxed resize-none focus:outline-none border-0"
-                    placeholder="支持 Markdown 语法
-
-# 标题
-## 二级标题
-**粗体** *斜体*
-- 列表项
-`代码`"
+                    className="flex-1 p-4 text-sm font-mono leading-relaxed resize-none focus:outline-none border-0 bg-transparent text-foreground placeholder:text-muted-foreground"
+                    placeholder="支持 Markdown 语法\n\n# 标题\n## 二级标题\n**粗体** *斜体*\n- 列表项\n`代码`"
                     value={editContent}
                     onChange={(e) => setEditContent(e.target.value)}
                   />
@@ -319,12 +316,10 @@ const Knowledge: React.FC = () => {
               </div>
             </div>
           ) : (
-            <div className="flex items-center justify-center min-h-[400px]">
-              <div className="text-center">
-                <div className="text-4xl mb-3">📚</div>
-                <p className="text-gray-500">选择一篇笔记开始编辑</p>
-                <p className="text-gray-400 text-sm mt-1">或点击"新建笔记"创建</p>
-              </div>
+            <div className="empty-state min-h-[400px]">
+              <div className="empty-icon"><BookOpen className="w-10 h-10" /></div>
+              <p className="empty-title">选择一篇笔记开始编辑</p>
+              <p className="empty-desc">或点击"新建笔记"创建</p>
             </div>
           )}
         </div>
@@ -337,12 +332,12 @@ const Knowledge: React.FC = () => {
         title="确认删除"
         footer={
           <>
-            <button className="btn-secondary" onClick={() => setShowDeleteConfirm(false)}>取消</button>
-            <button className="btn-primary bg-red-600 hover:bg-red-700" onClick={handleDeleteNote}>确认删除</button>
+            <button className="btn-secondary active:scale-[0.97] transition-all duration-200" onClick={() => setShowDeleteConfirm(false)}>取消</button>
+            <button className="btn-destructive active:scale-[0.97] transition-all duration-200" onClick={handleDeleteNote}>确认删除</button>
           </>
         }
       >
-        <p className="text-gray-700">确定删除这篇笔记？此操作不可撤销。</p>
+        <p className="text-foreground">确定删除这篇笔记？此操作不可撤销。</p>
       </Modal>
 
       {/* Folder modal */}
@@ -352,8 +347,8 @@ const Knowledge: React.FC = () => {
         title={folderForm.id ? '重命名文件夹' : '新建文件夹'}
         footer={
           <>
-            <button className="btn-secondary" onClick={() => setShowFolderModal(false)}>取消</button>
-            <button className="btn-primary" onClick={handleSaveFolder} disabled={!folderForm.name.trim()}>保存</button>
+            <button className="btn-secondary active:scale-[0.97] transition-all duration-200" onClick={() => setShowFolderModal(false)}>取消</button>
+            <button className="btn-primary active:scale-[0.97] transition-all duration-200" onClick={handleSaveFolder} disabled={!folderForm.name.trim()}>保存</button>
           </>
         }
       >
